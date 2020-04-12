@@ -28,10 +28,6 @@ class StaticSiteProps(object):
 
 
 class StaticSiteConstruct(core.Construct):
-    @property
-    def buckets(self):
-        return tuple(self._buckets)
-
     def __init__(self, scope: core.Construct, id: str, props: StaticSiteProps) -> None:
         super().__init__(scope, id)
 
@@ -54,7 +50,7 @@ class StaticSiteConstruct(core.Construct):
         certificate_arn: str = ssm.StringParameter.from_string_parameter_attributes(
             self,
             "MYCertArnString",
-            parameter_name="CertificateArn-{}".format(site_domain),
+            parameter_name="CertificateArn-{}".format(props.domain_name),
         ).string_value
 
         # CloudFront distribution that provides HTTPS

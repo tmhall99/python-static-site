@@ -4,5 +4,6 @@
     "domain": "webzetetic.com",
     "sub_domain": "newsite",
     "hosted_zone_id": "/hostedzone/Z005819235UNGR91YEXES"
-  }
+  },
+  "requireApproval": "any-change"
 }
