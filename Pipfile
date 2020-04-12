@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "*"
+pylint = "*"
+rope = "*"
+
+[packages]
+python-static-site = {editable = true,file = "file:///Users/thomashall/code/python-static-site"}
+aws-cdk-core = "*"
+aws-cdk-aws-iam = "*"
+aws-cdk-aws-s3 = "*"
+aws-cdk-aws-cloudfront = "*"
+aws-cdk-aws-route53 = "*"
+aws-cdk-aws-certificatemanager = "*"
+aws-cdk-aws-route53-targets = "*"
+aws-cdk-aws-ssm = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
