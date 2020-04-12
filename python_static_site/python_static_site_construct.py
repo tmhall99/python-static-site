@@ -9,7 +9,6 @@ from aws_cdk import (
 
 
 class StaticSiteProps(object):
-
     def __init__(self, domain_name: str, site_sub_domain: str, hosted_zone_id: str):
         self._domain_name = domain_name
         self._site_sub_domain = site_sub_domain
@@ -36,27 +35,26 @@ class StaticSiteConstruct(core.Construct):
     def __init__(self, scope: core.Construct, id: str, props: StaticSiteProps) -> None:
         super().__init__(scope, id)
 
-        site_domain: str = '{sub_domain}.{domain_name}'.format(
-            sub_domain=props.site_sub_domain,
-            domain_name=props.domain_name
+        site_domain: str = "{sub_domain}.{domain_name}".format(
+            sub_domain=props.site_sub_domain, domain_name=props.domain_name
         )
 
         # Content Bucket
         site_bucket = s3.Bucket(
             self,
-            'SiteBucket',
+            "SiteBucket",
             bucket_name=site_domain,
-            website_index_document='index.html',
-            website_error_document='error.html',
-            public_read_access=True
+            website_index_document="index.html",
+            website_error_document="error.html",
+            public_read_access=True,
         )
-        core.CfnOutput(self, 'Bucket', value=site_bucket.bucket_name)
+        core.CfnOutput(self, "Bucket", value=site_bucket.bucket_name)
 
         # Pre-existing ACM Certificate, with ARN stored in an SSM Parameter
         certificate_arn: str = ssm.StringParameter.from_string_parameter_attributes(
             self,
             "MYCertArnString",
-            parameter_name="CertificateArn-{}".format(site_domain)
+            parameter_name="CertificateArn-{}".format(site_domain),
         ).string_value
 
         # CloudFront distribution that provides HTTPS
@@ -64,36 +62,36 @@ class StaticSiteConstruct(core.Construct):
             acm_cert_ref=certificate_arn,
             names=[site_domain],
             ssl_method=cloudfront.SSLMethod.SNI,
-            security_policy=cloudfront.SecurityPolicyProtocol.TLS_V1_1_2016
+            security_policy=cloudfront.SecurityPolicyProtocol.TLS_V1_1_2016,
         )
 
         source_configuration = cloudfront.SourceConfiguration(
-            s3_origin_source=cloudfront.S3OriginConfig(
-                s3_bucket_source=site_bucket
-            ),
-            behaviors=[cloudfront.Behavior(is_default_behavior=True)]
+            s3_origin_source=cloudfront.S3OriginConfig(s3_bucket_source=site_bucket),
+            behaviors=[cloudfront.Behavior(is_default_behavior=True)],
         )
 
         distribution = cloudfront.CloudFrontWebDistribution(
             self,
-            'SiteDistribution',
+            "SiteDistribution",
             alias_configuration=alias_configuration,
-            origin_configs=[source_configuration]
+            origin_configs=[source_configuration],
         )
-        core.CfnOutput(self, 'DistributionId', value=distribution.distribution_id)
+        core.CfnOutput(self, "DistributionId", value=distribution.distribution_id)
 
         # Route53 alias record for the CloudFront Distribution
         zone = route53.HostedZone.from_hosted_zone_attributes(
             self,
             id="HostedZoneID",
             hosted_zone_id=props.hosted_zone_id,
-            zone_name=props.domain_name
+            zone_name=props.domain_name,
         )
 
         route53.ARecord(
             self,
-            'SiteAliasRecord',
+            "SiteAliasRecord",
             record_name=site_domain,
-            target=route53.AddressRecordTarget.from_alias(targets.CloudFrontTarget(distribution)),
-            zone=zone
+            target=route53.AddressRecordTarget.from_alias(
+                targets.CloudFrontTarget(distribution)
+            ),
+            zone=zone,
         )
